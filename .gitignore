@@ -1,4 +1,6 @@
 .env
+.claude-assistant
+.mcp
 __pycache__/
 *.pyc
 downloads/
