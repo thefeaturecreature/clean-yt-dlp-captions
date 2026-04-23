@@ -23,16 +23,20 @@ TAG_RE = re.compile(r"<[^>]+>")
 CUE_INDEX_RE = re.compile(r"^\d+$")
 HEADER_RE = re.compile(r"^(WEBVTT|Kind:|Language:)")
 SENTENCE_END_RE = re.compile(r'[.?!]["\']?$')
-ARTIFACTS_RE = re.compile(r"^>>?\s*|&[a-z]+;|&#\d+;|\[[^\]]*\]")
+SPEAKER_CHANGE_RE = re.compile(r"(?:&gt;){1,2}\s*|^>>?\s*")
+ARTIFACTS_RE = re.compile(r"&[a-z]+;|&#\d+;|\[[^\]]*\]")
 
 LLM_CLEAN_PROMPT = """\
 You are a transcript editor. The following is an auto-generated video transcript with transcription errors.
+Speaker changes are marked with [>>].
 
 Your tasks:
-1. Fix misspelled proper nouns, product names, and technical terms (e.g. "Ibuntu" → "Ubuntu").
-2. Add paragraph breaks where the speaker shifts topic or pauses meaningfully.
-3. Join short lines into flowing sentences where appropriate.
-4. Do not rephrase, summarize, or add any content that isn't in the original.
+1. Fix misspelled proper nouns, product names, and technical terms.
+2. Identify each speaker from context. Use "VO" for voiceover narration (introductory narration or factual statements inserted between exchanges), "Interviewer" for the host, and the guest's name when known. If a speaker cannot be identified, use "Speaker". Note: videos often open with a teaser clip from the conversation — the first voice may be the interviewer or the guest, not a VO.
+3. Label EVERY paragraph with the speaker as a bold prefix, e.g. **Yann LeCun:** — even if the speaker has not changed from the previous paragraph. Remove all [>>] markers.
+4. Add paragraph breaks where the speaker shifts topic or pauses meaningfully.
+5. Join short lines into flowing sentences where appropriate.
+6. Do not rephrase, summarize, or add any content that isn't in the original.
 
 Return only the corrected transcript text, no commentary.\
 """
@@ -89,6 +93,31 @@ def fetch_subtitles(url: str, output_dir: Path, lang: str, browser: str | None =
     return vtt_files[0]
 
 
+def dedupe_vtt(path: Path) -> str:
+    """Minimal VTT pre-processing: strip structure/tags, dedupe lines, preserve >> markers."""
+    lines = path.read_text(encoding="utf-8").splitlines()
+    text_lines = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        if HEADER_RE.match(line) or TIMESTAMP_RE.match(line) or CUE_INDEX_RE.match(line):
+            continue
+        line = TAG_RE.sub("", line)
+        # Normalise &gt;&gt; → >>
+        line = re.sub(r"(?:&gt;){1,2}", ">>", line).strip()
+        if line:
+            text_lines.append(line)
+
+    deduped = []
+    prev = None
+    for line in text_lines:
+        if line != prev:
+            deduped.append(line)
+            prev = line
+    return "\n".join(deduped)
+
+
 def clean_vtt(path: Path) -> list[str]:
     lines = path.read_text(encoding="utf-8").splitlines()
     text_lines = []
@@ -99,6 +128,7 @@ def clean_vtt(path: Path) -> list[str]:
         if HEADER_RE.match(line) or TIMESTAMP_RE.match(line) or CUE_INDEX_RE.match(line):
             continue
         line = TAG_RE.sub("", line)
+        line = SPEAKER_CHANGE_RE.sub("[>>] ", line)
         line = ARTIFACTS_RE.sub("", line).strip()
         if line:
             text_lines.append(line)
@@ -216,6 +246,7 @@ def main():
     parser.add_argument("input", help="Video URL or local .vtt file")
     parser.add_argument("output", nargs="?", help="Output .md file (default: output/[title].md)")
     parser.add_argument("--join", action="store_true", help="Merge lines into sentence paragraphs (heuristic)")
+    parser.add_argument("--raw", action="store_true", help="Send deduplicated raw VTT to LLM for stripping and parsing (experimental)")
     parser.add_argument("--llm", action="store_true", help="Clean transcript via LLM (fixes errors, adds paragraph breaks)")
     parser.add_argument("--model", default=os.environ.get("LLM_MODEL", "open-mistral-7b"),
                         help="LLM model to use (default: LLM_MODEL env var, or open-mistral-7b)")
@@ -261,7 +292,8 @@ def main():
     slug = slugify(title)
 
     if args.llm:
-        body = llm_clean("\n".join(lines), model=args.model)
+        raw_input = dedupe_vtt(vtt_path) if args.raw else "\n".join(lines)
+        body = llm_clean(raw_input, model=args.model)
         summary, llm_filename = llm_summarize(body, title=title, model=args.model)
         if llm_filename:
             slug = llm_filename
