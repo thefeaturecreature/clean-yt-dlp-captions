@@ -25,7 +25,7 @@ HEADER_RE = re.compile(r"^(WEBVTT|Kind:|Language:)")
 SENTENCE_END_RE = re.compile(r'[.?!]["\']?$')
 ARTIFACTS_RE = re.compile(r"^>>?\s*|&[a-z]+;|&#\d+;|\[[^\]]*\]")
 
-LLM_PROMPT = """\
+LLM_CLEAN_PROMPT = """\
 You are a transcript editor. The following is an auto-generated video transcript with transcription errors.
 
 Your tasks:
@@ -35,6 +35,13 @@ Your tasks:
 4. Do not rephrase, summarize, or add any content that isn't in the original.
 
 Return only the corrected transcript text, no commentary.\
+"""
+
+LLM_SUMMARY_PROMPT = """\
+You are a summarizer. The following is a cleaned video transcript.
+
+Write a concise TL;DR summary (3-5 sentences) covering the main points and key takeaways.
+Return only the summary, no commentary or heading.\
 """
 
 _DOWNLOADS = Path.home() / "Downloads"
@@ -115,28 +122,38 @@ def join_sentences(lines: list[str]) -> str:
     return "\n\n".join(paragraphs)
 
 
-def llm_clean(text: str, model: str) -> str:
+def _llm_client():
     from openai import OpenAI
-
     api_key = os.environ.get("LLM_API_KEY")
-    base_url = os.environ.get("LLM_BASE_URL")
-
     if not api_key:
         print("LLM_API_KEY not set in .env", file=sys.stderr)
         sys.exit(1)
+    return OpenAI(api_key=api_key, base_url=os.environ.get("LLM_BASE_URL"), timeout=120)
 
-    print(f"Cleaning transcript with {model}…")
-    client = OpenAI(api_key=api_key, base_url=base_url, timeout=120)
+
+def _llm_call(client, model: str, system_prompt: str, text: str, label: str) -> str:
+    print(f"{label}…")
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": LLM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": text},
         ],
     )
     usage = response.usage
     print(f"Tokens — prompt: {usage.prompt_tokens:,}  completion: {usage.completion_tokens:,}  total: {usage.total_tokens:,}")
     return response.choices[0].message.content.strip()
+
+
+def llm_clean(text: str, model: str) -> str:
+    client = _llm_client()
+    return _llm_call(client, model, LLM_CLEAN_PROMPT, text, f"Cleaning transcript with {model}")
+
+
+def llm_summarize(cleaned: str, model: str) -> str:
+    client = _llm_client()
+    time.sleep(1)
+    return _llm_call(client, model, LLM_SUMMARY_PROMPT, cleaned, f"Summarizing with {model}")
 
 
 def slugify(title: str, words: int = 5) -> str:
@@ -228,12 +245,13 @@ def main():
 
     if args.llm:
         body = llm_clean("\n".join(lines), model=args.model)
+        summary = llm_summarize(body, model=args.model)
+        transcript = header + f"## TL;DR\n\n{summary}\n\n---\n\n" + body
     elif args.join:
         body = join_sentences(lines)
+        transcript = header + body
     else:
-        body = "\n".join(lines)
-
-    transcript = header + body
+        transcript = header + "\n".join(lines)
 
     if args.output:
         out = Path(args.output)
