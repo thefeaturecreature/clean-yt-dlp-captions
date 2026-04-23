@@ -69,7 +69,7 @@ python3 clean_captions.py --cookies-from-browser chrome https://www.youtube.com/
 # or firefox, safari, edge, brave, etc.
 ```
 
-You must be logged in to the site in that browser. yt-dlp reads the cookie store directly — no export needed.
+You must be logged in to the site in that browser. yt-dlp reads the cookie store directly — no export needed. For YouTube, make sure Chrome is open with YouTube loaded in a tab before running.
 
 ## Output
 

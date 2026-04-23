@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -39,6 +40,13 @@ Return only the corrected transcript text, no commentary.\
 _DOWNLOADS = Path.home() / "Downloads"
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", _DOWNLOADS)).expanduser()
 VTT_DIR = Path(os.environ.get("VTT_DIR", _DOWNLOADS)).expanduser()
+
+
+def ensure_browser_ready(browser: str | None) -> None:
+    if browser == "chrome" and sys.platform == "darwin":
+        print("Opening Chrome with YouTube…")
+        subprocess.run(["open", "-a", "Google Chrome", "https://www.youtube.com"], check=True)
+        time.sleep(3)
 
 
 def fetch_metadata(url: str, browser: str | None = None) -> dict:
@@ -126,6 +134,8 @@ def llm_clean(text: str, model: str) -> str:
             {"role": "user", "content": text},
         ],
     )
+    usage = response.usage
+    print(f"Tokens — prompt: {usage.prompt_tokens:,}  completion: {usage.completion_tokens:,}  total: {usage.total_tokens:,}")
     return response.choices[0].message.content.strip()
 
 
@@ -186,6 +196,7 @@ def main():
     is_url = input_arg.startswith("http://") or input_arg.startswith("https://")
 
     if is_url:
+        ensure_browser_ready(args.browser)
         print("Fetching metadata…")
         try:
             meta = fetch_metadata(input_arg, browser=args.browser)
