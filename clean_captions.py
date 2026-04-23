@@ -36,8 +36,9 @@ Your tasks:
 Return only the corrected transcript text, no commentary.\
 """
 
-OUTPUT_DIR = Path(__file__).parent / "output"
-VTT_DIR = Path(__file__).parent / "downloads"
+_DOWNLOADS = Path.home() / "Downloads"
+OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", _DOWNLOADS)).expanduser()
+VTT_DIR = Path(os.environ.get("VTT_DIR", _DOWNLOADS)).expanduser()
 
 
 def fetch_metadata(url: str, browser: str | None = None) -> dict:
