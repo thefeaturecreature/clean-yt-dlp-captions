@@ -3,6 +3,7 @@
 # Types:
 #   single-speaker     — one person talking (lecture, solo presentation)
 #   interview          — host + guest(s), may include VO narration
+#   fireside           — on-stage interview, host frames topics, guest expounds
 #   panel              — multiple speakers without clear host/guest roles
 #   lecture            — academic or conference talk, single speaker
 #   vo-heavy           — narration-driven with embedded clips
@@ -32,3 +33,36 @@ videos:
       VO narration and guest speech alternate mid-sentence in several places,
       making clean speaker separation impossible from text alone.
       Good hard-case baseline for attribution evals.
+
+  - url: https://www.youtube.com/watch?v=CS5Cmz5FssI
+    id: CS5Cmz5FssI
+    title: 'How AI is Changing Software Engineering — Gergely Orosz (AI Engineer)'
+    type: fireside
+    difficulty: medium
+    speakers:
+      - name: Gergely Orosz
+        role: guest
+      - name: Host
+        role: host
+    notes: >
+      On-stage fireside format — distinct from a conversational interview in that
+      the host is primarily framing topics and setting the guest up to speak at
+      length on each sub-issue rather than exchanging back and forth.
+      Description contains a mini-bio for the interviewee, which may be a useful
+      source for speaker name extraction (issue #2).
+
+  - url: https://www.youtube.com/watch?v=wkv2ifxPpF8
+    id: wkv2ifxPpF8
+    title: 'How to Make Claude Code Your AI Engineering Team — Garry Tan (Y Combinator)'
+    type: single-speaker
+    difficulty: easy
+    speakers:
+      - name: Garry Tan
+        role: presenter
+    notes: >
+      Single speaker who introduces themselves — name is likely present early
+      in the VTT, good test case for self-identification extraction.
+      Quick cuts between segments with minimal spacing may cause minor text
+      breaks. Speaker shows screenshots/slides, so visual context is lost
+      but transcript quality is still testable. Good baseline for
+      error_correction and readability scoring without attribution complexity.

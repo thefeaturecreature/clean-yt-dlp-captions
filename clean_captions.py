@@ -86,7 +86,7 @@ def fetch_subtitles(url: str, output_dir: Path, lang: str, browser: str | None =
     vtt_files = list(output_dir.glob("*.vtt"))
     if not vtt_files:
         raise FileNotFoundError(f"No VTT subtitle file found after download (lang: {lang})")
-    return vtt_files[0]
+    return max(vtt_files, key=lambda p: p.stat().st_mtime)
 
 
 def clean_vtt(path: Path) -> list[str]:
