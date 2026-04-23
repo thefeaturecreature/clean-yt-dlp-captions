@@ -3,7 +3,5 @@
 .mcp
 __pycache__/
 *.pyc
-downloads/
-output/
 !README.md
 !FUNCTIONS.md
