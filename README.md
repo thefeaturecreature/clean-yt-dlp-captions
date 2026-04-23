@@ -1,6 +1,6 @@
 # clean-yt-dlp-captions
 
-Downloads captions from a video URL via yt-dlp, cleans up auto-generated subtitle artifacts, and produces a polished markdown transcript. Optionally runs the transcript through Mistral to fix transcription errors and add semantic paragraph breaks.
+Downloads captions from a video URL via yt-dlp, cleans up auto-generated subtitle artifacts, and produces a polished markdown transcript. Optionally runs the transcript through any OpenAI-compatible LLM to fix transcription errors and add semantic paragraph breaks.
 
 ## Requirements
 
@@ -18,8 +18,22 @@ pip install yt-dlp
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
-# add your Mistral API key to .env
+# fill in your LLM credentials and paths
 ```
+
+## Configuration (`.env`)
+
+```env
+LLM_API_KEY=your_key_here
+LLM_MODEL=open-mistral-7b
+LLM_BASE_URL=https://api.mistral.ai/v1
+
+# Optional — defaults to ~/Downloads
+OUTPUT_DIR=~/Documents/your/output/path
+VTT_DIR=~/Downloads
+```
+
+The script uses any OpenAI-compatible API endpoint. Point `LLM_BASE_URL` and `LLM_MODEL` at whichever provider you have a key for.
 
 ## Usage
 
@@ -39,11 +53,12 @@ python3 clean_captions.py --llm --output transcript.md https://www.youtube.com/w
 # Different subtitle language
 python3 clean_captions.py --lang es https://www.youtube.com/watch?v=...
 
+# Override model for this run
+python3 clean_captions.py --llm --model gpt-4o-mini https://www.youtube.com/watch?v=...
+
 # Process a local .vtt file instead
 python3 clean_captions.py --llm file.en.vtt
 ```
-
-Downloaded `.vtt` files go to `downloads/` and finished transcripts go to `output/` — both are gitignored.
 
 ## Authentication (cookies)
 
@@ -58,18 +73,8 @@ You must be logged in to the site in that browser. yt-dlp reads the cookie store
 
 ## Output
 
-Each run produces a `[Title].md` file containing:
+Each run produces a `[slug].md` file in `OUTPUT_DIR` containing:
 
 - Title, channel, URL, publish date, and duration
 - The video description
 - The cleaned transcript body
-
-## LLM cleaning
-
-`--llm` passes the transcript through an LLM to fix proper noun errors (e.g. auto-CC mishearing technical terms) and add topic-based paragraph breaks.
-
-The default provider is Mistral. Since Mistral's API is OpenAI-compatible, you can point it at any compatible endpoint by swapping the model name and API key in `.env`. Use `--model` to specify a different model:
-
-```bash
-python3 clean_captions.py --llm --model mistral-small-latest https://...
-```
