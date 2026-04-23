@@ -51,21 +51,21 @@ videos:
       Description contains a mini-bio for the interviewee, which may be a useful
       source for speaker name extraction (issue #2).
 
-  - url: https://www.youtube.com/watch?v=wkv2ifxPpF8
-    id: wkv2ifxPpF8
-    title: 'How to Make Claude Code Your AI Engineering Team — Garry Tan (Y Combinator)'
-    type: single-speaker
-    difficulty: easy
+  - url: https://www.youtube.com/watch?v=RyTwRCKeDo4
+    id: RyTwRCKeDo4
+    title: 'From SEO to Agent-Led Growth — James Cadwallader (Sequoia Capital)'
+    type: interview
+    difficulty: medium
     speakers:
-      - name: Garry Tan
-        role: presenter
+      - name: James Cadwallader
+        role: guest
+      - name: Host
+        role: host
     notes: >
-      Single speaker who introduces themselves — name is likely present early
-      in the VTT, good test case for self-identification extraction.
-      Quick cuts between segments with minimal spacing may cause minor text
-      breaks. Speaker shows screenshots/slides, so visual context is lost
-      but transcript quality is still testable. Good baseline for
-      error_correction and readability scoring without attribution complexity.
+      True two-way conversation — both speakers make declarative statements,
+      not purely Q&A. Guest is James Cadwallader (Profound); host is a Sequoia
+      interviewer (name extractable from transcript). Good test case for
+      attribution where conversational flow doesn't cleanly signal speaker changes.
 
   - url: https://www.youtube.com/watch?v=XhSpxGPa56Y
     id: XhSpxGPa56Y
