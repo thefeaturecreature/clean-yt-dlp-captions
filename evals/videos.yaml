@@ -22,7 +22,7 @@ videos:
     speakers:
       - name: Yann LeCun
         role: guest
-      - name: Interviewer
+      - name: Matt Kawecki
         role: host
       - name: VO
         role: narrator
@@ -42,7 +42,7 @@ videos:
     speakers:
       - name: Gergely Orosz
         role: guest
-      - name: Host
+      - name: Swyx
         role: host
     notes: >
       On-stage fireside format — distinct from a conversational interview in that
@@ -59,13 +59,12 @@ videos:
     speakers:
       - name: James Cadwallader
         role: guest
-      - name: Host
+      - name: Sonya Huang
         role: host
     notes: >
       True two-way conversation — both speakers make declarative statements,
-      not purely Q&A. Guest is James Cadwallader (Profound); host is a Sequoia
-      interviewer (name extractable from transcript). Good test case for
-      attribution where conversational flow doesn't cleanly signal speaker changes.
+      not purely Q&A. Good test case for attribution where conversational flow
+      doesn't cleanly signal speaker changes.
 
   - url: https://www.youtube.com/watch?v=XhSpxGPa56Y
     id: XhSpxGPa56Y

@@ -5,7 +5,7 @@ url: https://www.youtube.com/watch?v=CS5Cmz5FssI
 verified: unverified
 covers: full
 notes: >
-  First-pass pipeline output. Fireside format — Gergely Orosz guest, unknown host.
+  First-pass pipeline output. Fireside format — Gergely Orosz guest, Swyx host.
   Medium difficulty: two clear speakers, clean handoffs. Check speaker labels
   throughout; host lines not attributed in this draft (single-speaker pipeline run).
 ---

@@ -6,9 +6,9 @@ verified: unverified
 covers: full
 notes: >
   First-pass pipeline output. True two-way conversation — both speakers make
-  declarative statements, not purely Q&A. Guest is James Cadwallader (Profound);
-  host is a Sequoia interviewer (name TBD from transcript). Good test case for
-  attribution where the conversational pattern doesn't cleanly signal speaker changes.
+  declarative statements, not purely Q&A. Guest is James Cadwallader (Profound),
+  host is Sonya Huang (Sequoia). Good test case for attribution where the
+  conversational pattern doesn't cleanly signal speaker changes.
 ---
 
 # From SEO to Agent-Led Growth: Profound's James Cadwallader
