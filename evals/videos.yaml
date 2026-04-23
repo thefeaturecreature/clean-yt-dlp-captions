@@ -66,3 +66,21 @@ videos:
       breaks. Speaker shows screenshots/slides, so visual context is lost
       but transcript quality is still testable. Good baseline for
       error_correction and readability scoring without attribution complexity.
+
+  - url: https://www.youtube.com/watch?v=XhSpxGPa56Y
+    id: XhSpxGPa56Y
+    title: 'RubyConf 2017: Fireside Chat Q&A with Matz — Evan Phoenix & Matz'
+    type: fireside
+    difficulty: medium
+    speakers:
+      - name: Matz
+        role: guest
+      - name: Evan Phoenix
+        role: host
+      - name: Audience
+        role: audience
+    notes: >
+      Fireside chat with audience Q&A. Three speaker classes: host, guest, and
+      consolidated audience questions (no need to distinguish between individual
+      audience members — all labelled "Audience Question"). Good test case for
+      audience-voice attribution alongside the standard host/guest split.
