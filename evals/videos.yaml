@@ -1,0 +1,34 @@
+# Eval test videos for transcript cleaning and speaker attribution
+#
+# Types:
+#   single-speaker     — one person talking (lecture, solo presentation)
+#   interview          — host + guest(s), may include VO narration
+#   panel              — multiple speakers without clear host/guest roles
+#   lecture            — academic or conference talk, single speaker
+#   vo-heavy           — narration-driven with embedded clips
+#
+# Difficulty:
+#   easy    — single speaker, clean captions, no attribution needed
+#   medium  — two clear speakers, minimal VO, clean handoffs
+#   hard    — mid-sentence switches, ambiguous opener, VO interleaved with guest
+
+videos:
+  - url: https://www.youtube.com/watch?v=XnnnAx5lrx8
+    id: XnnnAx5lrx8
+    title: '"LLMs Are A Dead End" — Yann LeCun Interview'
+    type: interview
+    difficulty: hard
+    speakers:
+      - name: Yann LeCun
+        role: guest
+      - name: Interviewer
+        role: host
+      - name: VO
+        role: narrator
+    reference: references/XnnnAx5lrx8.md
+    notes: >
+      Opens with a teaser clip of the guest speaking before the VO introduction —
+      a common interview format that causes mis-attribution of the first voice as VO.
+      VO narration and guest speech alternate mid-sentence in several places,
+      making clean speaker separation impossible from text alone.
+      Good hard-case baseline for attribution evals.

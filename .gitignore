@@ -6,3 +6,5 @@ __pycache__/
 !README.md
 !FUNCTIONS.md
 *.vtt
+evals/vtts/
+evals/results/
