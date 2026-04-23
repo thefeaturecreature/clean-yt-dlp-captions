@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 EVALS_DIR = Path(__file__).parent
-VTTS_DIR = EVALS_DIR / "vtts"
+VTTS_DIR = EVALS_DIR / "vtts"  # raw VTTs from yt-dlp; deduplication happens at pipeline time
 RESULTS_DIR = EVALS_DIR / "results"
 REFERENCES_DIR = EVALS_DIR / "references"
 
