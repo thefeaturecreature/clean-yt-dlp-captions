@@ -45,11 +45,12 @@ videos:
       - name: Swyx
         role: host
     notes: >
-      On-stage fireside format — distinct from a conversational interview in that
-      the host is primarily framing topics and setting the guest up to speak at
-      length on each sub-issue rather than exchanging back and forth.
-      Description contains a mini-bio for the interviewee, which may be a useful
-      source for speaker name extraction (issue #2).
+      On-stage fireside format — host primarily frames topics and sets up the guest
+      to speak at length. Host name (Swyx) is unreachable from the video itself —
+      never spoken, not in description or title. Only derivable via channel →
+      event organizer → known cofounder (multi-hop). Expected to fail gracefully
+      on any automated speaker-name extraction (issue #2). Description contains
+      a mini-bio for the guest, which may be useful for guest-name extraction.
 
   - url: https://www.youtube.com/watch?v=RyTwRCKeDo4
     id: RyTwRCKeDo4
