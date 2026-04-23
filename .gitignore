@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 !README.md
 !FUNCTIONS.md
+*.vtt

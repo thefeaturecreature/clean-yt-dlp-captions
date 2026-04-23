@@ -38,10 +38,13 @@ Return only the corrected transcript text, no commentary.\
 """
 
 LLM_SUMMARY_PROMPT = """\
-You are a summarizer. The following is a cleaned video transcript.
+You are a summarizer. The following is a cleaned video transcript with its original title.
 
-Write a concise TL;DR summary (3-5 sentences) covering the main points and key takeaways.
-Return only the summary, no commentary or heading.\
+Return a JSON object with exactly two fields:
+- "filename": 5-6 descriptive words capturing the core topic, plain words only (no punctuation, no numbers unless essential) — the caller will join them with dashes
+- "summary": a concise TL;DR (3-5 sentences) covering the main points and key takeaways
+
+Return only the JSON object, no markdown fencing or commentary.\
 """
 
 _DOWNLOADS = Path.home() / "Downloads"
@@ -150,10 +153,22 @@ def llm_clean(text: str, model: str) -> str:
     return _llm_call(client, model, LLM_CLEAN_PROMPT, text, f"Cleaning transcript with {model}")
 
 
-def llm_summarize(cleaned: str, model: str) -> str:
+def llm_summarize(cleaned: str, title: str, model: str) -> tuple[str, str]:
     client = _llm_client()
     time.sleep(1)
-    return _llm_call(client, model, LLM_SUMMARY_PROMPT, cleaned, f"Summarizing with {model}")
+    text = f"Title: {title}\n\n{cleaned}"
+    raw = _llm_call(client, model, LLM_SUMMARY_PROMPT, text, f"Summarizing with {model}")
+    # Strip markdown fencing if the model wraps it anyway
+    raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
+    try:
+        data = json.loads(raw)
+        summary = data.get("summary", "")
+        words = data.get("filename", "").lower().split()
+        filename = "-".join(w for w in words if w)
+    except (json.JSONDecodeError, AttributeError):
+        summary = raw
+        filename = ""
+    return summary, filename
 
 
 def slugify(title: str, words: int = 5) -> str:
@@ -243,9 +258,13 @@ def main():
         header = f"# {title}\n\n"
         lines = clean_vtt(vtt_path)
 
+    slug = slugify(title)
+
     if args.llm:
         body = llm_clean("\n".join(lines), model=args.model)
-        summary = llm_summarize(body, model=args.model)
+        summary, llm_filename = llm_summarize(body, title=title, model=args.model)
+        if llm_filename:
+            slug = llm_filename
         transcript = header + f"## TL;DR\n\n{summary}\n\n---\n\n" + body
     elif args.join:
         body = join_sentences(lines)
@@ -257,7 +276,7 @@ def main():
         out = Path(args.output)
     else:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        out = OUTPUT_DIR / f"{slugify(title)}.md"
+        out = OUTPUT_DIR / f"{slug}.md"
 
     out.write_text(transcript, encoding="utf-8")
     print(f"Written to {out}")
