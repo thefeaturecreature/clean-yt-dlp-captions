@@ -1,0 +1,86 @@
+# Eval test videos for transcript cleaning and speaker attribution
+#
+# Types:
+#   single-speaker     — one person talking (lecture, solo presentation)
+#   interview          — host + guest(s), may include VO narration
+#   fireside           — on-stage interview, host frames topics, guest expounds
+#   panel              — multiple speakers without clear host/guest roles
+#   lecture            — academic or conference talk, single speaker
+#   vo-heavy           — narration-driven with embedded clips
+#
+# Difficulty:
+#   easy    — single speaker, clean captions, no attribution needed
+#   medium  — two clear speakers, minimal VO, clean handoffs
+#   hard    — mid-sentence switches, ambiguous opener, VO interleaved with guest
+
+videos:
+  - url: https://www.youtube.com/watch?v=XnnnAx5lrx8
+    id: XnnnAx5lrx8
+    title: '"LLMs Are A Dead End" — Yann LeCun Interview'
+    type: interview
+    difficulty: hard
+    speakers:
+      - name: Yann LeCun
+        role: guest
+      - name: Matt Kawecki
+        role: host
+      - name: VO
+        role: narrator
+    reference: references/XnnnAx5lrx8.md
+    notes: >
+      Opens with a teaser clip of the guest speaking before the VO introduction —
+      a common interview format that causes mis-attribution of the first voice as VO.
+      VO narration and guest speech alternate mid-sentence in several places,
+      making clean speaker separation impossible from text alone.
+      Good hard-case baseline for attribution evals.
+
+  - url: https://www.youtube.com/watch?v=CS5Cmz5FssI
+    id: CS5Cmz5FssI
+    title: 'How AI is Changing Software Engineering — Gergely Orosz (AI Engineer)'
+    type: fireside
+    difficulty: medium
+    speakers:
+      - name: Gergely Orosz
+        role: guest
+      - name: Swyx
+        role: host
+    notes: >
+      On-stage fireside format — host primarily frames topics and sets up the guest
+      to speak at length. Host name (Swyx) is unreachable from the video itself —
+      never spoken, not in description or title. Only derivable via channel →
+      event organizer → known cofounder (multi-hop). Expected to fail gracefully
+      on any automated speaker-name extraction (issue #2). Description contains
+      a mini-bio for the guest, which may be useful for guest-name extraction.
+
+  - url: https://www.youtube.com/watch?v=RyTwRCKeDo4
+    id: RyTwRCKeDo4
+    title: 'From SEO to Agent-Led Growth — James Cadwallader (Sequoia Capital)'
+    type: interview
+    difficulty: medium
+    speakers:
+      - name: James Cadwallader
+        role: guest
+      - name: Sonya Huang
+        role: host
+    notes: >
+      True two-way conversation — both speakers make declarative statements,
+      not purely Q&A. Good test case for attribution where conversational flow
+      doesn't cleanly signal speaker changes.
+
+  - url: https://www.youtube.com/watch?v=XhSpxGPa56Y
+    id: XhSpxGPa56Y
+    title: 'RubyConf 2017: Fireside Chat Q&A with Matz — Evan Phoenix & Matz'
+    type: fireside
+    difficulty: medium
+    speakers:
+      - name: Matz
+        role: guest
+      - name: Evan Phoenix
+        role: host
+      - name: Audience
+        role: audience
+    notes: >
+      Fireside chat with audience Q&A. Three speaker classes: host, guest, and
+      consolidated audience questions (no need to distinguish between individual
+      audience members — all labelled "Audience Question"). Good test case for
+      audience-voice attribution alongside the standard host/guest split.
